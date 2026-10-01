@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  @apply bg-stone-50 text-stone-900;
+}
+
+@layer components {
+  .label {
+    @apply mb-1 block text-sm font-medium text-stone-700;
+  }
+  .input {
+    @apply w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-base text-stone-900 shadow-sm outline-none placeholder:text-stone-400 focus:border-stone-500 focus:ring-2 focus:ring-stone-200 sm:text-sm;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-medium text-stone-800 shadow-sm transition hover:bg-stone-100 disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply border-stone-900 bg-stone-900 text-white hover:bg-stone-700;
+  }
+  .btn-danger {
+    @apply border-rose-300 text-rose-700 hover:bg-rose-50;
+  }
+  .card {
+    @apply rounded-xl border border-stone-200 bg-white shadow-sm;
+  }
+}

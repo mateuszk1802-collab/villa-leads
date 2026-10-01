@@ -1,1 +1,40 @@
-# villa-leads
+# Villa Leads
+
+Narzędzie do pozyskiwania klientów na filmowe wideo dla luksusowych willi.
+Pełna specyfikacja: [SPEC.md](SPEC.md).
+
+Stack (100% darmowy): Next.js + TypeScript + Tailwind, hosting Vercel (Hobby), Supabase (Free).
+
+## Uruchomienie — krok po kroku
+
+### 1. Supabase (baza + logowanie)
+1. Załóż konto na [supabase.com](https://supabase.com) → **New project** (plan Free). Zapisz hasło do bazy.
+2. W projekcie: **SQL Editor → New query** → wklej całą zawartość pliku
+   [`supabase/schema.sql`](supabase/schema.sql) → **Run**.
+3. **Authentication → Sign In / Providers → Email**: wyłącz **Allow new users to sign up**
+   (aplikacja ma tylko jednego użytkownika — Ciebie).
+4. **Authentication → Users → Add user → Create new user**: wpisz swój e-mail i hasło,
+   zaznacz **Auto Confirm User**. Tymi danymi będziesz się logować.
+5. **Project Settings → API Keys** (oraz **Data API**): skopiuj
+   - *Project URL* → to będzie `NEXT_PUBLIC_SUPABASE_URL`
+   - klucz *anon public* albo *publishable* → to będzie `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+### 2. Vercel (hosting)
+1. Załóż konto na [vercel.com](https://vercel.com) (plan Hobby) i zaloguj się przez GitHub.
+2. **Add New → Project** → wybierz repo `villa-leads` → **Import**.
+3. W **Environment Variables** dodaj obie zmienne z kroku 1.5 → **Deploy**.
+4. Po kilku minutach dostaniesz adres aplikacji (np. `villa-leads.vercel.app`).
+
+Każdy pull request dostaje też własny podgląd (link „Preview” w komentarzu Vercela pod PR).
+
+### Lokalnie (opcjonalnie, dla programisty)
+```bash
+cp .env.example .env.local   # uzupełnij wartości
+npm install
+npm run dev
+```
+
+## Bezpieczeństwo
+- Klucze tylko w zmiennych środowiskowych (`.env.local` jest ignorowany przez git).
+- Dane chronią reguły RLS w Supabase — każdy widzi wyłącznie swoje leady.
+- Aplikacja nigdy nie wysyła maili sama.
