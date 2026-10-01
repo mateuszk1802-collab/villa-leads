@@ -92,7 +92,10 @@ export default async function LeadsPage({ searchParams }: { searchParams: Search
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2">
         <h1 className="text-xl font-semibold">Leady</h1>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap justify-end gap-2">
+          <Link href="/leads/search" className="btn">
+            Szukaj w Google
+          </Link>
           <Link href="/leads/import" className="btn">
             Wklej adresy www
           </Link>

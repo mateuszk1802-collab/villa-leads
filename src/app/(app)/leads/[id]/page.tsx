@@ -45,7 +45,15 @@ export default async function LeadPage({ params }: PageProps<"/leads/[id]">) {
         <div className="min-w-0">
           <h1 className="text-xl font-semibold break-words">{lead.name}</h1>
           <p className="text-sm text-stone-500">
-            {[LEAD_TYPE_LABEL[lead.lead_type], lead.location].filter(Boolean).join(" · ")}
+            {[
+              LEAD_TYPE_LABEL[lead.lead_type],
+              lead.location,
+              lead.google_rating != null
+                ? `★ ${Number(lead.google_rating).toFixed(1)} (${lead.google_reviews ?? 0}) w Google`
+                : null,
+            ]
+              .filter(Boolean)
+              .join(" · ")}
           </p>
         </div>
         <div className="flex flex-wrap gap-1">
