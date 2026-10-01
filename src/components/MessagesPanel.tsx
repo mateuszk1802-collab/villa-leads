@@ -9,6 +9,7 @@ import {
   buildFooter,
   buildPrompt,
   footerProblems,
+  gmailHref,
   hasFooter,
   kindInfo,
   mailtoHref,
@@ -255,6 +256,14 @@ export function MessagesPanel({
             >
               Kopiuj temat
             </button>
+            <a
+              href={gmailHref(lead.email, draft.subject, draft.body)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn"
+            >
+              Otwórz w Gmailu ↗
+            </a>
             <a href={mailtoHref(lead.email, draft.subject, draft.body)} className="btn">
               Otwórz w poczcie
             </a>
@@ -268,7 +277,9 @@ export function MessagesPanel({
             </button>
           </div>
           <p className="text-xs text-stone-500">
-            Aplikacja nic nie wysyła sama. „Wysłałem” zapisuje datę i przesuwa lead na etap „
+            „Otwórz w poczcie” działa, jeśli masz ustawiony program pocztowy (np. Outlook, Mail na
+            iPhonie). Jeśli korzystasz z Gmaila w przeglądarce, użyj „Otwórz w Gmailu”. Aplikacja nic
+            nie wysyła sama. „Wysłałem” zapisuje datę i przesuwa lead na etap „
             {STAGE_LABEL[kindInfo(kind).nextStage]}”.
           </p>
         </div>
