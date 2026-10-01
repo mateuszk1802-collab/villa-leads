@@ -230,3 +230,15 @@ export function mailtoHref(to: string | null, subject: string, body: string): st
   const params = [`subject=${encodeURIComponent(subject)}`, `body=${encodeURIComponent(body)}`];
   return `mailto:${to ? encodeURIComponent(to) : ""}?${params.join("&")}`;
 }
+
+/** Okno „Nowa wiadomość” w Gmailu w przeglądarce (działa bez programu pocztowego). */
+export function gmailHref(to: string | null, subject: string, body: string): string {
+  const params = [
+    "view=cm",
+    "fs=1",
+    to ? `to=${encodeURIComponent(to)}` : null,
+    `su=${encodeURIComponent(subject)}`,
+    `body=${encodeURIComponent(body)}`,
+  ].filter(Boolean);
+  return `https://mail.google.com/mail/?${params.join("&")}`;
+}
