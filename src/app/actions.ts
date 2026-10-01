@@ -159,7 +159,12 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return { error: "Nieprawidłowy e-mail lub hasło." };
+  if (error) {
+    if (error.code === "invalid_credentials") return { error: "Nieprawidłowy e-mail lub hasło." };
+    if (error.code === "email_not_confirmed")
+      return { error: "E-mail niepotwierdzony — w Supabase zaznacz „Auto Confirm User”." };
+    return { error: `Błąd logowania (sprawdź konfigurację Supabase): ${error.message}` };
+  }
 
   revalidatePath("/", "layout");
   redirect("/leads");
