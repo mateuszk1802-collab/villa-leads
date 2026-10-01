@@ -2,10 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { deleteLead, updateLead } from "@/app/actions";
 import { LeadForm } from "@/components/LeadForm";
+import { MessagesPanel } from "@/components/MessagesPanel";
 import { StageBadge } from "@/components/StageBadge";
 import { StageSelect } from "@/components/StageSelect";
 import { ConfirmSubmit } from "@/components/ConfirmSubmit";
 import { LEAD_TYPE_LABEL, formatDate, type Lead } from "@/lib/leads";
+import type { LeadMessage } from "@/lib/messages";
+import { loadSettings } from "@/lib/settings";
 import { requireUser } from "@/lib/supabase/server";
 
 export default async function LeadPage({ params }: PageProps<"/leads/[id]">) {
@@ -13,9 +16,17 @@ export default async function LeadPage({ params }: PageProps<"/leads/[id]">) {
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
 
   const { supabase } = await requireUser();
-  const { data } = await supabase.from("leads").select("*").eq("id", id).maybeSingle();
+  const [{ data }, settings, { data: msgs }] = await Promise.all([
+    supabase.from("leads").select("*").eq("id", id).maybeSingle(),
+    loadSettings(supabase),
+    supabase
+      .from("lead_messages")
+      .select("id,lead_id,kind,subject,body,sent_at,updated_at")
+      .eq("lead_id", id),
+  ]);
   if (!data) notFound();
   const lead = data as Lead;
+  const messages = (msgs ?? []) as LeadMessage[];
 
   const update = updateLead.bind(null, lead.id);
 
@@ -47,6 +58,11 @@ export default async function LeadPage({ params }: PageProps<"/leads/[id]">) {
                 Strona www ↗
               </a>
             )}
+            {lead.demo_url && (
+              <a href={lead.demo_url} target="_blank" rel="noopener noreferrer" className="btn">
+                Demo ↗
+              </a>
+            )}
             {lead.listing_url && (
               <a href={lead.listing_url} target="_blank" rel="noopener noreferrer" className="btn">
                 Oferta ↗
@@ -66,6 +82,8 @@ export default async function LeadPage({ params }: PageProps<"/leads/[id]">) {
           <Info label="Follow-up 2" value={formatDate(lead.followup2_at)} />
         </dl>
       </section>
+
+      <MessagesPanel lead={lead} settings={settings} messages={messages} />
 
       <section className="card p-4 sm:p-6">
         <h2 className="mb-4 font-semibold">Dane leada</h2>
