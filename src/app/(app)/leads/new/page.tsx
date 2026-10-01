@@ -9,6 +9,16 @@ export default function NewLeadPage() {
         ← Leady
       </Link>
       <h1 className="text-xl font-semibold">Nowy lead</h1>
+      <Link
+        href="/leads/import"
+        className="card flex items-center justify-between gap-2 p-4 text-sm hover:bg-stone-50"
+      >
+        <span>
+          <span className="font-medium">Masz listę stron www?</span> Wklej wiele adresów naraz — aplikacja
+          sama znajdzie e-maile i sprawdzi wideo.
+        </span>
+        <span aria-hidden>→</span>
+      </Link>
       <div className="card p-4 sm:p-6">
         <LeadForm action={createLead} submitLabel="Dodaj lead" showStage />
       </div>

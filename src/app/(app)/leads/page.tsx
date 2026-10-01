@@ -88,9 +88,14 @@ export default async function LeadsPage({ searchParams }: { searchParams: Search
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2">
         <h1 className="text-xl font-semibold">Leady</h1>
-        <Link href="/leads/new" className="btn btn-primary hidden sm:inline-flex">
-          + Dodaj lead
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/leads/import" className="btn">
+            Wklej adresy www
+          </Link>
+          <Link href="/leads/new" className="btn btn-primary hidden sm:inline-flex">
+            + Dodaj lead
+          </Link>
+        </div>
       </div>
 
       {/* Etapy jako szybkie filtry */}

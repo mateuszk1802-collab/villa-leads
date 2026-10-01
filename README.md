@@ -39,6 +39,13 @@ w SQL Editor → **Run** (skrypt można uruchamiać wielokrotnie, nie kasuje dan
 3. Odpowiedź Claude wklej w pole **Treść** (temat rozpozna się sam) → **Zapisz maila**.
 4. **Otwórz w poczcie** (albo Kopiuj) → wyślij ze swojej skrzynki → kliknij **Wysłałem**.
 
+## Dodawanie leadów z listy stron www (Etap 3)
+**Leady → Wklej adresy www** → wklej adresy (każdy w nowej linii) → **Dodaj i sprawdź strony**.
+Aplikacja tworzy leady (bez duplikatów po domenie) i dla każdego pobiera publiczną stronę główną
+oraz kontaktową: szuka e-maila i sprawdza, czy jest wideo. Zasady: szanuje `robots.txt`,
+maks. 1 zapytanie na sekundę, nic nie pobiera z airbnb.com, vrbo.com ani booking.com.
+Pojedynczego leada sprawdzisz przyciskiem **Sprawdź stronę** na jego stronie.
+
 ### Lokalnie (opcjonalnie, dla programisty)
 ```bash
 cp .env.example .env.local   # uzupełnij wartości
