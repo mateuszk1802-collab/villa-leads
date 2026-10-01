@@ -1,4 +1,4 @@
--- Villa Leads — schemat bazy (Etap 1)
+-- Villa Leads — schemat bazy (Etapy 1–2)
 -- Wklej całość w Supabase → SQL Editor → New query → Run.
 -- Skrypt można bezpiecznie uruchomić ponownie.
 
@@ -80,3 +80,70 @@ create policy "leads_update_own" on public.leads
 drop policy if exists "leads_delete_own" on public.leads;
 create policy "leads_delete_own" on public.leads
   for delete to authenticated using ((select auth.uid()) = user_id);
+
+-- =====================================================================
+-- Etap 2: link do demo, Ustawienia (moje dane + stopka), zapisane maile
+-- =====================================================================
+
+alter table public.leads add column if not exists demo_url text;
+
+create table if not exists public.settings (
+  user_id uuid primary key default auth.uid() references auth.users (id) on delete cascade,
+  sender_name text,
+  company_name text,
+  email text,
+  phone text,
+  website text,
+  portfolio_url text,
+  postal_address text, -- CAN-SPAM wymaga fizycznego adresu pocztowego
+  unsubscribe_text text,
+  footer text, -- własna stopka; pusta = budowana automatycznie z danych powyżej
+  offer_text text, -- dodatkowy opis oferty dla Claude
+  extra_instructions text, -- dodatkowe wskazówki stylu dla Claude
+  updated_at timestamptz not null default now()
+);
+
+drop trigger if exists settings_set_updated_at on public.settings;
+create trigger settings_set_updated_at
+  before update on public.settings
+  for each row execute function public.set_updated_at();
+
+alter table public.settings enable row level security;
+
+drop policy if exists "settings_all_own" on public.settings;
+create policy "settings_all_own" on public.settings
+  for all to authenticated
+  using ((select auth.uid()) = user_id)
+  with check ((select auth.uid()) = user_id);
+
+create table if not exists public.lead_messages (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
+  lead_id uuid not null references public.leads (id) on delete cascade,
+  kind text not null check (kind in ('initial', 'followup_1', 'followup_2')),
+  subject text,
+  body text,
+  sent_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (lead_id, kind)
+);
+
+create index if not exists lead_messages_user_idx on public.lead_messages (user_id);
+
+drop trigger if exists lead_messages_set_updated_at on public.lead_messages;
+create trigger lead_messages_set_updated_at
+  before update on public.lead_messages
+  for each row execute function public.set_updated_at();
+
+alter table public.lead_messages enable row level security;
+
+drop policy if exists "lead_messages_all_own" on public.lead_messages;
+create policy "lead_messages_all_own" on public.lead_messages
+  for all to authenticated
+  using ((select auth.uid()) = user_id)
+  with check ((select auth.uid()) = user_id);
+
+-- Uprawnienia dla zalogowanego użytkownika (dostęp i tak ograniczają reguły RLS powyżej)
+grant select, insert, update, delete on public.leads, public.settings, public.lead_messages
+  to authenticated;

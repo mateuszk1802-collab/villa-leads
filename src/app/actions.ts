@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient, requireUser } from "@/lib/supabase/server";
+import { isMessageKind, kindInfo, type MessageKind } from "@/lib/messages";
 import {
   STAGE_DATE_COLUMN,
   domainFromUrl,
@@ -34,6 +35,10 @@ function parseLeadForm(formData: FormData) {
   const listing_url = normalizeUrl(listingRaw);
   if (listingRaw && !listing_url) return { error: "Niepoprawny link do oferty." } as const;
 
+  const demoRaw = text(formData, "demo_url");
+  const demo_url = normalizeUrl(demoRaw);
+  if (demoRaw && !demo_url) return { error: "Niepoprawny link do demo." } as const;
+
   const email = text(formData, "email");
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
     return { error: "Niepoprawny adres e-mail." } as const;
@@ -59,6 +64,7 @@ function parseLeadForm(formData: FormData) {
       email,
       phone: text(formData, "phone"),
       listing_url,
+      demo_url,
       property_count,
       has_video: isHasVideo(has_video) ? has_video : "unknown",
       notes: text(formData, "notes"),
@@ -152,6 +158,10 @@ export async function deleteLead(formData: FormData) {
 }
 
 export async function signIn(_prev: FormState, formData: FormData): Promise<FormState> {
+  const demoRaw = text(formData, "demo_url");
+  const demo_url = normalizeUrl(demoRaw);
+  if (demoRaw && !demo_url) return { error: "Niepoprawny link do demo." } as const;
+
   const email = text(formData, "email");
   const password = formData.get("password");
   if (!email || typeof password !== "string" || !password)
@@ -175,4 +185,100 @@ export async function signOut() {
   await supabase.auth.signOut();
   revalidatePath("/", "layout");
   redirect("/login");
+}
+
+const SETTINGS_FIELDS = [
+  "sender_name",
+  "company_name",
+  "email",
+  "phone",
+  "website",
+  "portfolio_url",
+  "postal_address",
+  "unsubscribe_text",
+  "footer",
+  "offer_text",
+  "extra_instructions",
+] as const;
+
+export async function saveSettings(_prev: FormState, formData: FormData): Promise<FormState> {
+  const { supabase, userId } = await requireUser();
+  const row: Record<string, string | null> = {};
+  for (const f of SETTINGS_FIELDS) row[f] = text(formData, f);
+
+  const email = row.email;
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    return { error: "Niepoprawny adres e-mail." };
+
+  const { error } = await supabase
+    .from("settings")
+    .upsert({ user_id: userId, ...row }, { onConflict: "user_id" });
+  if (error) return { error: `Błąd zapisu: ${error.message}` };
+
+  revalidatePath("/", "layout");
+  return { saved: true };
+}
+
+async function assertContactAllowed(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  leadId: string,
+) {
+  const { data } = await supabase
+    .from("leads")
+    .select("id,do_not_contact")
+    .eq("id", leadId)
+    .maybeSingle();
+  if (!data) return "Nie znaleziono leada.";
+  if (data.do_not_contact) return "Ten lead jest na liście „Nie kontaktować”.";
+  return null;
+}
+
+export async function saveMessage(
+  leadId: string,
+  kind: MessageKind,
+  subject: string,
+  body: string,
+): Promise<{ error?: string }> {
+  const { supabase } = await requireUser();
+  if (!isMessageKind(kind)) return { error: "Nieznany typ wiadomości." };
+  const blocked = await assertContactAllowed(supabase, leadId);
+  if (blocked) return { error: blocked };
+
+  const { error } = await supabase.from("lead_messages").upsert(
+    {
+      lead_id: leadId,
+      kind,
+      subject: subject.trim() || null,
+      body: body.trim() || null,
+    },
+    { onConflict: "lead_id,kind" },
+  );
+  if (error) return { error: `Błąd zapisu: ${error.message}` };
+
+  revalidatePath(`/leads/${leadId}`);
+  return {};
+}
+
+/** „Wysłałem”: zapisuje datę wysłania i przesuwa lead na odpowiedni etap. Nic nie wysyła. */
+export async function markSent(leadId: string, kind: MessageKind): Promise<{ error?: string }> {
+  const { supabase } = await requireUser();
+  if (!isMessageKind(kind)) return { error: "Nieznany typ wiadomości." };
+  const blocked = await assertContactAllowed(supabase, leadId);
+  if (blocked) return { error: blocked };
+
+  const now = new Date().toISOString();
+  const { error: msgError } = await supabase
+    .from("lead_messages")
+    .upsert({ lead_id: leadId, kind, sent_at: now }, { onConflict: "lead_id,kind" });
+  if (msgError) return { error: `Błąd zapisu: ${msgError.message}` };
+
+  const stage = kindInfo(kind).nextStage;
+  const update: Record<string, unknown> = { stage, stage_changed_at: now };
+  const col = STAGE_DATE_COLUMN[stage];
+  if (col) update[col] = now;
+  const { error } = await supabase.from("leads").update(update).eq("id", leadId);
+  if (error) return { error: `Błąd zapisu: ${error.message}` };
+
+  revalidatePath("/", "layout");
+  return {};
 }

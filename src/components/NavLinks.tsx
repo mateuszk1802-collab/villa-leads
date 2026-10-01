@@ -7,6 +7,7 @@ const LINKS = [
   { href: "/leads", label: "Leady", match: (p: string) => p === "/leads" || /^\/leads\/(?!new)/.test(p) },
   { href: "/pipeline", label: "Pipeline", match: (p: string) => p.startsWith("/pipeline") },
   { href: "/leads/new", label: "+ Dodaj", match: (p: string) => p === "/leads/new" },
+  { href: "/settings", label: "Ustawienia", match: (p: string) => p.startsWith("/settings") },
 ];
 
 export function NavLinks({ variant }: { variant: "top" | "bottom" }) {
@@ -29,7 +30,7 @@ export function NavLinks({ variant }: { variant: "top" | "bottom" }) {
     );
   }
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-3 border-t border-stone-200 bg-white pb-[env(safe-area-inset-bottom)] sm:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-4 border-t border-stone-200 bg-white pb-[env(safe-area-inset-bottom)] sm:hidden">
       {LINKS.map((l) => (
         <Link
           key={l.href}

@@ -22,10 +22,22 @@ Stack (100% darmowy): Next.js + TypeScript + Tailwind, hosting Vercel (Hobby), S
 ### 2. Vercel (hosting)
 1. Załóż konto na [vercel.com](https://vercel.com) (plan Hobby) i zaloguj się przez GitHub.
 2. **Add New → Project** → wybierz repo `villa-leads` → **Import**.
-3. W **Environment Variables** dodaj obie zmienne z kroku 1.5 → **Deploy**.
-4. Po kilku minutach dostaniesz adres aplikacji (np. `villa-leads.vercel.app`).
+3. W **Environment Variables** dodaj obie zmienne z kroku 1.5 jako typ **Config**
+   (nie „Secret” — zmienne `NEXT_PUBLIC_…` nie mogą być sekretami) → **Deploy**.
+4. Po każdej zmianie zmiennych: **Deployments → … → Redeploy**.
+5. Po kilku minutach dostaniesz adres aplikacji (np. `villa-leads.vercel.app`).
 
 Każdy pull request dostaje też własny podgląd (link „Preview” w komentarzu Vercela pod PR).
+
+### Aktualizacja bazy po nowym etapie
+Gdy nowa wersja zmienia bazę, wklej ponownie **cały** plik `supabase/schema.sql`
+w SQL Editor → **Run** (skrypt można uruchamiać wielokrotnie, nie kasuje danych).
+
+## Jak przygotować maila (Etap 2)
+1. **Ustawienia** → uzupełnij swoje dane i adres pocztowy (stopka CAN-SPAM).
+2. Na stronie leada wybierz typ maila → **Kopiuj prompt dla Claude** → **Otwórz Claude** → wklej.
+3. Odpowiedź Claude wklej w pole **Treść** (temat rozpozna się sam) → **Zapisz maila**.
+4. **Otwórz w poczcie** (albo Kopiuj) → wyślij ze swojej skrzynki → kliknij **Wysłałem**.
 
 ### Lokalnie (opcjonalnie, dla programisty)
 ```bash

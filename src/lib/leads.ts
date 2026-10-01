@@ -62,6 +62,7 @@ export type Lead = {
   email: string | null;
   phone: string | null;
   listing_url: string | null;
+  demo_url: string | null;
   property_count: number | null;
   has_video: HasVideo;
   notes: string | null;

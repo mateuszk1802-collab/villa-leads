@@ -117,6 +117,17 @@ export function LeadForm({ action, lead, submitLabel, showStage }: Props) {
         </Field>
       </div>
 
+      <Field label="Link do demo wideo (jeśli już zrobione)" htmlFor="demo_url">
+        <input
+          id="demo_url"
+          name="demo_url"
+          inputMode="url"
+          placeholder="https://youtu.be/… albo link do Dysku"
+          defaultValue={lead?.demo_url ?? ""}
+          className="input"
+        />
+      </Field>
+
       {showStage && (
         <Field label="Etap" htmlFor="stage">
           <select id="stage" name="stage" defaultValue="new" className="input">
