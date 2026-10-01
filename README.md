@@ -46,6 +46,12 @@ oraz kontaktową: szuka e-maila i sprawdza, czy jest wideo. Zasady: szanuje `rob
 maks. 1 zapytanie na sekundę, nic nie pobiera z airbnb.com, vrbo.com ani booking.com.
 Pojedynczego leada sprawdzisz przyciskiem **Sprawdź stronę** na jego stronie.
 
+## Przypomnienia i „Nie kontaktować” (Etap 4)
+- **Dziś** (pierwsza zakładka, liczba w kółku): leady, którym minęły 4 dni od wysłania
+  (czas na follow-up 1) i 7 dni od follow-upu 1 (czas na follow-up 2), plus „W najbliższych dniach”.
+- Na stronie leada: **Wypisał się — nie kontaktować**. Taki lead znika z przypomnień, a przygotowanie
+  wiadomości jest zablokowane. Lista: **Leady → Nie kontaktować**.
+
 ### Lokalnie (opcjonalnie, dla programisty)
 ```bash
 cp .env.example .env.local   # uzupełnij wartości

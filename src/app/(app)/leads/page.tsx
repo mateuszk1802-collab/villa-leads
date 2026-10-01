@@ -26,18 +26,20 @@ export default async function LeadsPage({ searchParams }: { searchParams: Search
   const stage = one(sp.stage);
   const type = one(sp.type);
   const video = one(sp.video);
+  const dnc = one(sp.dnc) === "1" ? "1" : undefined;
 
   const { supabase } = await requireUser();
 
   let query = supabase
     .from("leads")
-    .select("id,name,lead_type,location,website,domain,email,phone,has_video,stage,property_count,updated_at")
+    .select("id,name,lead_type,location,website,domain,email,phone,has_video,stage,property_count,do_not_contact,updated_at")
     .order("updated_at", { ascending: false })
     .limit(500);
 
   if (isStage(stage)) query = query.eq("stage", stage);
   if (isLeadType(type)) query = query.eq("lead_type", type);
   if (isHasVideo(video)) query = query.eq("has_video", video);
+  if (dnc) query = query.eq("do_not_contact", true);
   if (q) {
     // Znaki , ( ) * % mają specjalne znaczenie w filtrze PostgREST — usuwamy je
     const safe = q.replace(/[,()*%\\]/g, " ").trim();
@@ -51,7 +53,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Search
 
   const [{ data: leads, error }, { data: allStages }] = await Promise.all([
     query,
-    supabase.from("leads").select("stage"),
+    supabase.from("leads").select("stage,do_not_contact"),
   ]);
 
   const counts = new Map<Stage, number>();
@@ -59,10 +61,11 @@ export default async function LeadsPage({ searchParams }: { searchParams: Search
     counts.set(row.stage as Stage, (counts.get(row.stage as Stage) ?? 0) + 1);
   }
   const total = allStages?.length ?? 0;
+  const dncCount = (allStages ?? []).filter((r) => r.do_not_contact).length;
 
   function hrefWith(params: Record<string, string | undefined>) {
     const next = new URLSearchParams();
-    const merged = { q: q || undefined, stage, type, video, ...params };
+    const merged = { q: q || undefined, stage, type, video, dnc, ...params };
     for (const [k, v] of Object.entries(merged)) if (v) next.set(k, v);
     const s = next.toString();
     return s ? `/leads?${s}` : "/leads";
@@ -81,6 +84,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Search
     | "has_video"
     | "stage"
     | "property_count"
+    | "do_not_contact"
     | "updated_at"
   >[];
 
@@ -100,7 +104,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Search
 
       {/* Etapy jako szybkie filtry */}
       <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
-        <Chip href={hrefWith({ stage: undefined })} active={!isStage(stage)}>
+        <Chip href={hrefWith({ stage: undefined, dnc: undefined })} active={!isStage(stage) && !dnc}>
           Wszystkie <span className="opacity-60">{total}</span>
         </Chip>
         {STAGES.map((s) => (
@@ -108,10 +112,14 @@ export default async function LeadsPage({ searchParams }: { searchParams: Search
             {s.label} <span className="opacity-60">{counts.get(s.key) ?? 0}</span>
           </Chip>
         ))}
+        <Chip href={hrefWith({ stage: undefined, dnc: dnc ? undefined : "1" })} active={Boolean(dnc)}>
+          Nie kontaktować <span className="opacity-60">{dncCount}</span>
+        </Chip>
       </div>
 
       <form method="get" className="card grid gap-2 p-3 sm:grid-cols-[1fr_auto_auto_auto]">
         {isStage(stage) && <input type="hidden" name="stage" value={stage} />}
+        {dnc && <input type="hidden" name="dnc" value="1" />}
         <input
           name="q"
           defaultValue={q}
@@ -176,6 +184,11 @@ export default async function LeadsPage({ searchParams }: { searchParams: Search
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="truncate font-medium">{l.name}</span>
+                    {l.do_not_contact && (
+                      <span className="shrink-0 rounded-full bg-rose-600 px-2 py-0.5 text-xs font-medium text-white">
+                        Nie kontaktować
+                      </span>
+                    )}
                     <span className="sm:hidden">
                       <StageBadge stage={l.stage} />
                     </span>

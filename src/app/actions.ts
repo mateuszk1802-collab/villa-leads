@@ -177,7 +177,7 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
   }
 
   revalidatePath("/", "layout");
-  redirect("/leads");
+  redirect("/today");
 }
 
 export async function signOut() {
@@ -279,6 +279,18 @@ export async function markSent(leadId: string, kind: MessageKind): Promise<{ err
   const { error } = await supabase.from("leads").update(update).eq("id", leadId);
   if (error) return { error: `Błąd zapisu: ${error.message}` };
 
+  revalidatePath("/", "layout");
+  return {};
+}
+
+/** Lista „Nie kontaktować” — np. gdy ktoś poprosił o wypisanie. */
+export async function setDoNotContact(id: string, value: boolean): Promise<{ error?: string }> {
+  const { supabase } = await requireUser();
+  const { error } = await supabase
+    .from("leads")
+    .update({ do_not_contact: value, do_not_contact_at: value ? new Date().toISOString() : null })
+    .eq("id", id);
+  if (error) return { error: `Błąd zapisu: ${error.message}` };
   revalidatePath("/", "layout");
   return {};
 }

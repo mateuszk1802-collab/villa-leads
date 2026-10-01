@@ -6,6 +6,7 @@ import { MessagesPanel } from "@/components/MessagesPanel";
 import { StageBadge } from "@/components/StageBadge";
 import { StageSelect } from "@/components/StageSelect";
 import { ConfirmSubmit } from "@/components/ConfirmSubmit";
+import { DoNotContactToggle } from "@/components/DoNotContactToggle";
 import { EnrichButton } from "@/components/EnrichButton";
 import { LEAD_TYPE_LABEL, formatDate, type Lead } from "@/lib/leads";
 import type { LeadMessage } from "@/lib/messages";
@@ -47,7 +48,14 @@ export default async function LeadPage({ params }: PageProps<"/leads/[id]">) {
             {[LEAD_TYPE_LABEL[lead.lead_type], lead.location].filter(Boolean).join(" · ")}
           </p>
         </div>
-        <StageBadge stage={lead.stage} />
+        <div className="flex flex-wrap gap-1">
+          {lead.do_not_contact && (
+            <span className="rounded-full bg-rose-600 px-2 py-0.5 text-xs font-medium text-white">
+              Nie kontaktować
+            </span>
+          )}
+          <StageBadge stage={lead.stage} />
+        </div>
       </div>
 
       <section className="card space-y-3 p-4 sm:p-6">
@@ -91,6 +99,13 @@ export default async function LeadPage({ params }: PageProps<"/leads/[id]">) {
       </section>
 
       <MessagesPanel lead={lead} settings={settings} messages={messages} />
+
+      <DoNotContactToggle
+        id={lead.id}
+        name={lead.name}
+        value={lead.do_not_contact}
+        since={lead.do_not_contact_at}
+      />
 
       <section className="card p-4 sm:p-6">
         <h2 className="mb-4 font-semibold">Dane leada</h2>

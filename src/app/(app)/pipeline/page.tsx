@@ -5,7 +5,7 @@ export default async function PipelinePage() {
   const { supabase } = await requireUser();
   const { data, error } = await supabase
     .from("leads")
-    .select("id,name,location,domain,email,stage,updated_at")
+    .select("id,name,location,domain,email,stage,do_not_contact,updated_at")
     .order("updated_at", { ascending: false })
     .limit(1000);
 
