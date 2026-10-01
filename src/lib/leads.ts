@@ -72,6 +72,8 @@ export type Lead = {
   followup1_at: string | null;
   followup2_at: string | null;
   do_not_contact: boolean;
+  enriched_at: string | null;
+  enrich_note: string | null;
   created_at: string;
   updated_at: string;
 };

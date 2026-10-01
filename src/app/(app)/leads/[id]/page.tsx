@@ -6,10 +6,14 @@ import { MessagesPanel } from "@/components/MessagesPanel";
 import { StageBadge } from "@/components/StageBadge";
 import { StageSelect } from "@/components/StageSelect";
 import { ConfirmSubmit } from "@/components/ConfirmSubmit";
+import { EnrichButton } from "@/components/EnrichButton";
 import { LEAD_TYPE_LABEL, formatDate, type Lead } from "@/lib/leads";
 import type { LeadMessage } from "@/lib/messages";
 import { loadSettings } from "@/lib/settings";
 import { requireUser } from "@/lib/supabase/server";
+
+// „Sprawdź stronę” pobiera kilka stron z odstępem 1 s
+export const maxDuration = 60;
 
 export default async function LeadPage({ params }: PageProps<"/leads/[id]">) {
   const { id } = await params;
@@ -75,6 +79,9 @@ export default async function LeadPage({ params }: PageProps<"/leads/[id]">) {
             )}
           </div>
         </div>
+        {lead.website && (
+          <EnrichButton id={lead.id} enrichedAt={lead.enriched_at} note={lead.enrich_note} />
+        )}
         <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm sm:grid-cols-4">
           <Info label="Dodano" value={formatDate(lead.created_at)} />
           <Info label="Wysłano" value={formatDate(lead.sent_at)} />

@@ -1,4 +1,4 @@
--- Villa Leads — schemat bazy (Etapy 1–2)
+-- Villa Leads — schemat bazy (Etapy 1–3)
 -- Wklej całość w Supabase → SQL Editor → New query → Run.
 -- Skrypt można bezpiecznie uruchomić ponownie.
 
@@ -143,6 +143,13 @@ create policy "lead_messages_all_own" on public.lead_messages
   for all to authenticated
   using ((select auth.uid()) = user_id)
   with check ((select auth.uid()) = user_id);
+
+-- =====================================================================
+-- Etap 3: wzbogacanie (pobieranie publicznej strony firmy)
+-- =====================================================================
+
+alter table public.leads add column if not exists enriched_at timestamptz;
+alter table public.leads add column if not exists enrich_note text;
 
 -- Uprawnienia dla zalogowanego użytkownika (dostęp i tak ograniczają reguły RLS powyżej)
 grant select, insert, update, delete on public.leads, public.settings, public.lead_messages
