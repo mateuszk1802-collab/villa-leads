@@ -58,7 +58,7 @@ export async function updateSession(request: NextRequest) {
   }
   if (loggedIn && path === "/login") {
     const to = request.nextUrl.clone();
-    to.pathname = "/leads";
+    to.pathname = "/today";
     to.search = "";
     return NextResponse.redirect(to);
   }

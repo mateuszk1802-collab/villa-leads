@@ -1,4 +1,4 @@
--- Villa Leads — schemat bazy (Etapy 1–3)
+-- Villa Leads — schemat bazy (Etapy 1–4)
 -- Wklej całość w Supabase → SQL Editor → New query → Run.
 -- Skrypt można bezpiecznie uruchomić ponownie.
 
@@ -150,6 +150,12 @@ create policy "lead_messages_all_own" on public.lead_messages
 
 alter table public.leads add column if not exists enriched_at timestamptz;
 alter table public.leads add column if not exists enrich_note text;
+
+-- =====================================================================
+-- Etap 4: lista „Nie kontaktować”
+-- =====================================================================
+
+alter table public.leads add column if not exists do_not_contact_at timestamptz;
 
 -- Uprawnienia dla zalogowanego użytkownika (dostęp i tak ograniczają reguły RLS powyżej)
 grant select, insert, update, delete on public.leads, public.settings, public.lead_messages

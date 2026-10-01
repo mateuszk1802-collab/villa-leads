@@ -5,7 +5,7 @@ import { useState, useTransition } from "react";
 import { setStage } from "@/app/actions";
 import { STAGES, STAGE_COLOR, type Lead, type Stage } from "@/lib/leads";
 
-export type KanbanLead = Pick<Lead, "id" | "name" | "location" | "domain" | "email" | "stage">;
+export type KanbanLead = Pick<Lead, "id" | "name" | "location" | "domain" | "email" | "stage" | "do_not_contact">;
 
 export function KanbanBoard({ leads: initial }: { leads: KanbanLead[] }) {
   const [leads, setLeads] = useState(initial);
@@ -84,7 +84,11 @@ export function KanbanBoard({ leads: initial }: { leads: KanbanLead[] }) {
                     <p className="truncate text-xs text-stone-500">
                       {[l.location, l.domain].filter(Boolean).join(" · ") || "—"}
                     </p>
-                    {!l.email && <p className="text-xs text-amber-700">Brak e-maila</p>}
+                    {l.do_not_contact ? (
+                      <p className="text-xs font-medium text-rose-700">Nie kontaktować</p>
+                    ) : (
+                      !l.email && <p className="text-xs text-amber-700">Brak e-maila</p>
+                    )}
                     <select
                       aria-label="Przenieś do etapu"
                       value={l.stage}
