@@ -52,6 +52,26 @@ Pojedynczego leada sprawdzisz przyciskiem **Sprawdź stronę** na jego stronie.
 - Na stronie leada: **Wypisał się — nie kontaktować**. Taki lead znika z przypomnień, a przygotowanie
   wiadomości jest zablokowane. Lista: **Leady → Nie kontaktować**.
 
+## Wyszukiwarka firm w Google (Etap 5, opcjonalna)
+Korzysta z Google Places API. Darmowy limit: 1000 wyszukiwań miesięcznie (do 20 firm każde).
+Google wymaga podpięcia karty, ale z limitem dziennym poniżej rachunek wynosi 0 zł.
+
+1. [console.cloud.google.com](https://console.cloud.google.com) → zaloguj się → u góry **Select a project →
+   New project** → nazwa `villa-leads` → **Create**.
+2. **Billing** → podepnij kartę (wymagane przez Google, nawet przy darmowym limicie).
+3. **APIs & Services → Library** → wyszukaj **Places API (New)** → **Enable**.
+4. **APIs & Services → Credentials → Create credentials → API key** → skopiuj klucz.
+   Kliknij klucz → **API restrictions → Restrict key → Places API (New)** → **Save**.
+5. **Limit dzienny (ważne):** **APIs & Services → Places API (New) → Quotas** → znajdź
+   „SearchTextRequest per day” (Text Search) → ołówek → ustaw np. **30** → **Save**.
+   30 dziennie × 31 dni = 930 < 1000 darmowych, więc nie zapłacisz nic.
+6. (Dla spokoju) **Billing → Budgets & alerts → Create budget** → kwota 1 USD → alert e-mail.
+7. Vercel → **Settings → Environment Variables** → `GOOGLE_PLACES_API_KEY` = klucz, typ **Secret**
+   → **Save** → **Deployments → … → Redeploy**.
+
+Użycie: **Leady → Szukaj w Google** → region (np. „Scottsdale, AZ”) i hasło → **Szukaj** → zaznacz
+firmy → **Dodaj zaznaczone**. Aplikacja od razu sprawdza ich strony (e-mail, wideo).
+
 ### Lokalnie (opcjonalnie, dla programisty)
 ```bash
 cp .env.example .env.local   # uzupełnij wartości

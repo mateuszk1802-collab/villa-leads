@@ -10,6 +10,16 @@ export default function NewLeadPage() {
       </Link>
       <h1 className="text-xl font-semibold">Nowy lead</h1>
       <Link
+        href="/leads/search"
+        className="card flex items-center justify-between gap-2 p-4 text-sm hover:bg-stone-50"
+      >
+        <span>
+          <span className="font-medium">Szukaj firm w Google</span> — wpisz region, zaznacz firmy i
+          dodaj je jednym kliknięciem.
+        </span>
+        <span aria-hidden>→</span>
+      </Link>
+      <Link
         href="/leads/import"
         className="card flex items-center justify-between gap-2 p-4 text-sm hover:bg-stone-50"
       >

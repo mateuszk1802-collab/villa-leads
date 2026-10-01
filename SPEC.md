@@ -10,7 +10,8 @@ oraz właściciele dużych willi.
 ## Założenia
 
 - Aplikacja działa w 100% za darmo: tylko darmowe plany Vercel i Supabase, **bez płatnych API**
-  (bez Anthropic API, bez Google Places API).
+  (bez Anthropic API). Wyjątek: opcjonalna wyszukiwarka Google Places (funkcja 9) w darmowym
+  limicie Google, zabezpieczona limitem dziennym.
 - Jeden użytkownik (właściciel aplikacji).
 - Interfejs po polsku, wygodny na telefonie. Generowane maile po angielsku.
 - Wszystkie klucze tylko w zmiennych środowiskowych — nigdy w kodzie ani w repo. Plik `.env.example`.
@@ -67,6 +68,13 @@ od follow-upu 1 (→ follow-up 2).
 ### 8. Lista „Nie kontaktować”
 Jeśli ktoś się wypisał, oznaczam go, a aplikacja blokuje przygotowanie do niego wiadomości.
 
+### 9. Wyszukiwarka Google Places (dodana później, opcjonalna)
+Region + hasło (domyślne: „luxury vacation rental management”, „luxury villa rentals”). Wyniki: nazwa,
+adres, www, ocena. Zaznaczone firmy dodaje do bazy (bez duplikatów po domenie / miejscu w Google)
+i od razu uruchamia wzbogacanie. Korzysta z darmowego miesięcznego limitu Google (1000 wyszukiwań);
+wymaga konta rozliczeniowego Google, a limit dzienny w Google Cloud gwarantuje koszt 0 zł.
+Bez klucza API aplikacja działa normalnie, bez tej zakładki.
+
 ## Plan pracy
 
 | Etap | Zakres |
@@ -75,5 +83,6 @@ Jeśli ktoś się wypisał, oznaczam go, a aplikacja blokuje przygotowanie do ni
 | 2 | Generator wiadomości: Ustawienia (moje dane, stopka), „Kopiuj prompt dla Claude”, „Wklej gotowego maila”, Kopiuj / Otwórz w poczcie / Wysłałem |
 | 3 | Dodawanie leadów z listy adresów www + wzbogacanie (e-mail, wykrywanie wideo) |
 | 4 | „Do zrobienia dziś” (przypomnienia) + lista „Nie kontaktować” |
+| 5 | Wyszukiwarka firm Google Places (opcjonalna, w darmowym limicie) |
 
 Po każdym etapie: pull request z krótkim opisem po polsku i czekanie na akceptację.

@@ -150,6 +150,9 @@ export function buildPrompt(args: {
     line("Website", lead.website),
     line("Listing (e.g. Airbnb)", lead.listing_url),
     line("Number of properties", lead.property_count),
+    lead.google_rating != null
+      ? `- Google rating: ${lead.google_rating} (${lead.google_reviews ?? 0} reviews)`
+      : null,
     `- Video already on their website: ${HAS_VIDEO_EN[lead.has_video]}`,
     line("Demo video I made for them", lead.demo_url),
     lead.notes?.trim() ? `- My notes (what I noticed on their photos/website):\n${lead.notes.trim()}` : null,
