@@ -10,8 +10,8 @@ oraz właściciele dużych willi.
 ## Założenia
 
 - Aplikacja działa w 100% za darmo: tylko darmowe plany Vercel i Supabase, **bez płatnych API**
-  (bez Anthropic API). Wyjątek: opcjonalna wyszukiwarka Google Places (funkcja 9) w darmowym
-  limicie Google, zabezpieczona limitem dziennym.
+  w wersji podstawowej. Dodatki opcjonalne: wyszukiwarka Google Places (funkcja 9, w darmowym
+  limicie Google) i pisanie maili przez Claude API (funkcja 10, płatne za użycie, ok. 1–2 centy za maila).
 - Jeden użytkownik (właściciel aplikacji).
 - Interfejs po polsku, wygodny na telefonie. Generowane maile po angielsku.
 - Wszystkie klucze tylko w zmiennych środowiskowych — nigdy w kodzie ani w repo. Plik `.env.example`.
@@ -75,6 +75,12 @@ i od razu uruchamia wzbogacanie. Korzysta z darmowego miesięcznego limitu Googl
 wymaga konta rozliczeniowego Google, a limit dzienny w Google Cloud gwarantuje koszt 0 zł.
 Bez klucza API aplikacja działa normalnie, bez tej zakładki.
 
+### 10. Claude pisze maile (dodane później, opcjonalne)
+Gdy ustawiony jest klucz `ANTHROPIC_API_KEY`: przycisk „Napisz maila (Claude)” przy leadzie i „Przygotuj
+wszystkie follow-upy” na liście „Do zrobienia dziś”. Model `claude-sonnet-5-5`, ten sam prompt co przy
+kopiowaniu (plus fragment strony firmy). Wynik zapisuje się jako szkic — aplikacja nadal nigdy nie wysyła
+maili sama. Płatne z konta Claude API (ok. 1–2 centy za maila). Bez klucza działa wersja z kopiowaniem.
+
 ## Plan pracy
 
 | Etap | Zakres |
@@ -84,5 +90,6 @@ Bez klucza API aplikacja działa normalnie, bez tej zakładki.
 | 3 | Dodawanie leadów z listy adresów www + wzbogacanie (e-mail, wykrywanie wideo) |
 | 4 | „Do zrobienia dziś” (przypomnienia) + lista „Nie kontaktować” |
 | 5 | Wyszukiwarka firm Google Places (opcjonalna, w darmowym limicie) |
+| 6 | Claude pisze maile przez API (opcjonalne, płatne za użycie) |
 
 Po każdym etapie: pull request z krótkim opisem po polsku i czekanie na akceptację.

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { markSent, saveMessage } from "@/app/actions";
+import { generateEmail } from "@/app/ai-actions";
 import { formatDate, type Lead } from "@/lib/leads";
 import {
   MESSAGE_KINDS,
@@ -46,10 +47,12 @@ export function MessagesPanel({
   lead,
   settings,
   messages,
+  aiEnabled = false,
 }: {
   lead: Lead;
   settings: Settings;
   messages: LeadMessage[];
+  aiEnabled?: boolean;
 }) {
   const [kind, setKind] = useState<MessageKind>(suggestedKind(lead.stage));
   const [drafts, setDrafts] = useState<Record<MessageKind, Draft>>(() => {
@@ -63,6 +66,7 @@ export function MessagesPanel({
   const [flash, setFlash] = useState<string>();
   const [error, setError] = useState<string>();
   const [pending, startTransition] = useTransition();
+  const [writing, setWriting] = useState(false);
 
   const saved = messages.find((m) => m.kind === kind);
   const draft = drafts[kind];
@@ -111,6 +115,24 @@ export function MessagesPanel({
         notify("Zapisano maila.");
       }
     });
+  }
+
+  async function writeWithClaude() {
+    if (draft.body.trim() && !window.confirm("Zastąpić obecną treść nowym mailem od Claude?")) return;
+    setWriting(true);
+    setError(undefined);
+    try {
+      const res = await generateEmail(lead.id, kind);
+      if (res.error) setError(res.error);
+      else {
+        setDrafts((d) => ({ ...d, [kind]: { subject: res.subject ?? "", body: res.body ?? "" } }));
+        notify("Claude napisał maila i zapisał go jako szkic. Przeczytaj go przed wysłaniem.");
+      }
+    } catch {
+      setError("Błąd połączenia z aplikacją. Spróbuj ponownie.");
+    } finally {
+      setWriting(false);
+    }
   }
 
   if (lead.do_not_contact) {
@@ -169,16 +191,28 @@ export function MessagesPanel({
       <div className="space-y-2">
         <h3 className="text-sm font-semibold text-stone-700">1. Poproś Claude o maila</h3>
         <div className="flex flex-wrap gap-2">
+          {aiEnabled && (
+            <button
+              type="button"
+              className="btn btn-primary"
+              disabled={writing || pending || Boolean(saved?.sent_at)}
+              onClick={writeWithClaude}
+            >
+              {writing ? "Claude pisze…" : "✨ Napisz maila (Claude)"}
+            </button>
+          )}
           <button
             type="button"
-            className="btn btn-primary"
+            className={aiEnabled ? "btn" : "btn btn-primary"}
             onClick={() => onCopy(prompt, "prompt dla Claude")}
           >
             Kopiuj prompt dla Claude
           </button>
-          <a href="https://claude.ai/new" target="_blank" rel="noopener noreferrer" className="btn">
-            Otwórz Claude ↗
-          </a>
+          {!aiEnabled && (
+            <a href="https://claude.ai/new" target="_blank" rel="noopener noreferrer" className="btn">
+              Otwórz Claude ↗
+            </a>
+          )}
         </div>
         <details className="text-sm">
           <summary className="cursor-pointer text-stone-500">Pokaż prompt</summary>

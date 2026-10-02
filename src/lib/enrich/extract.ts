@@ -169,3 +169,19 @@ export function findContactUrl(html: string, baseUrl: string): string | null {
   candidates.sort((a, b) => b.score - a.score);
   return candidates[0]?.url ?? null;
 }
+
+/** Widoczny tekst strony (bez skryptów, stylów, menu i stopki), skrócony — kontekst dla Claude. */
+export function extractVisibleText(html: string, maxChars = 1500): string {
+  const text = decodeEntities(
+    html
+      .replace(/<(head|script|style|noscript|svg|nav|footer|header|template)\b[\s\S]*?<\/\1>/gi, " ")
+      .replace(/<!--[\s\S]*?-->/g, " ")
+      .replace(/<br\s*\/?>|<\/(p|div|h[1-6]|li|section)>/gi, "\n")
+      .replace(/<[^>]+>/g, " "),
+  )
+    .replace(/[ \t\u00a0]+/g, " ")
+    .replace(/\s*\n\s*/g, "\n")
+    .replace(/\n{2,}/g, "\n")
+    .trim();
+  return text.length > maxChars ? text.slice(0, maxChars).replace(/\s+\S*$/, "") + "…" : text;
+}

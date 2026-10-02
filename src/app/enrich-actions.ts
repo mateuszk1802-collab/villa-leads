@@ -125,6 +125,7 @@ export async function enrichLead(id: string): Promise<EnrichSummary> {
     enriched_at: new Date().toISOString(),
     enrich_note: result.notes.join("\n"),
   };
+  if (result.excerpt) update.site_excerpt = result.excerpt;
   const emailUpdated = Boolean(result.email && !lead.email);
   if (emailUpdated) update.email = result.email;
   // Nie nadpisujemy tego, co ustawiłeś ręcznie — tylko „nie wiem”

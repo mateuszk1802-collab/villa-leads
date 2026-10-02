@@ -1,4 +1,4 @@
--- Villa Leads — schemat bazy (Etapy 1–5)
+-- Villa Leads — schemat bazy (Etapy 1–6)
 -- Wklej całość w Supabase → SQL Editor → New query → Run.
 -- Skrypt można bezpiecznie uruchomić ponownie.
 
@@ -168,6 +168,12 @@ alter table public.leads add column if not exists google_reviews integer;
 create unique index if not exists leads_user_place_key
   on public.leads (user_id, google_place_id)
   where google_place_id is not null;
+
+-- =====================================================================
+-- Etap 6: pisanie maili przez Claude API (fragment strony firmy jako kontekst)
+-- =====================================================================
+
+alter table public.leads add column if not exists site_excerpt text;
 
 -- Uprawnienia dla zalogowanego użytkownika (dostęp i tak ograniczają reguły RLS powyżej)
 grant select, insert, update, delete on public.leads, public.settings, public.lead_messages

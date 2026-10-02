@@ -75,6 +75,7 @@ export type Lead = {
   do_not_contact_at: string | null;
   enriched_at: string | null;
   enrich_note: string | null;
+  site_excerpt: string | null;
   google_place_id: string | null;
   google_rating: number | null;
   google_reviews: number | null;
