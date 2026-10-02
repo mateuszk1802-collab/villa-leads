@@ -3,6 +3,7 @@ import {
   detectVideo,
   extractEmails,
   extractSiteName,
+  extractVisibleText,
   findContactUrl,
   pickBestEmail,
   type VideoKind,
@@ -16,6 +17,7 @@ export type EnrichResult = {
   /** null = nie udało się sprawdzić żadnej strony */
   video: VideoKind[] | null;
   siteName: string | null;
+  excerpt: string | null;
   notes: string[];
 };
 
@@ -26,6 +28,7 @@ export async function enrichSite(website: string, domain: string | null): Promis
   const emails = new Set<string>();
   const video = new Set<VideoKind>();
   let siteName: string | null = null;
+  let excerpt: string | null = null;
   let pagesChecked = 0;
 
   let home: { url: string; html: string } | null = null;
@@ -34,7 +37,15 @@ export async function enrichSite(website: string, domain: string | null): Promis
     if (!home) notes.push("robots.txt nie pozwala pobrać strony głównej");
   } catch (e) {
     if (e instanceof FetchBlocked) {
-      return { ok: false, email: null, emails: [], video: null, siteName: null, notes: [e.message] };
+      return {
+        ok: false,
+        email: null,
+        emails: [],
+        video: null,
+        siteName: null,
+        excerpt: null,
+        notes: [e.message],
+      };
     }
     notes.push(`Strona główna: ${e instanceof Error ? describe(e) : "błąd"}`);
   }
@@ -44,6 +55,7 @@ export async function enrichSite(website: string, domain: string | null): Promis
     extractEmails(home.html).forEach((e) => emails.add(e));
     detectVideo(home.html).forEach((v) => video.add(v));
     siteName = extractSiteName(home.html);
+    excerpt = extractVisibleText(home.html) || null;
 
     const contactUrl = findContactUrl(home.html, home.url) ?? new URL("/contact", home.url).toString();
     try {
@@ -74,6 +86,7 @@ export async function enrichSite(website: string, domain: string | null): Promis
     emails: list,
     video: pagesChecked ? [...video] : null,
     siteName,
+    excerpt,
     notes,
   };
 }

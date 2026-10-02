@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { TodayBatch } from "@/components/TodayBatch";
+import { claudeConfigured } from "@/lib/claude";
 import { formatDate } from "@/lib/leads";
 import {
   FOLLOWUP1_AFTER_DAYS,
@@ -20,6 +22,22 @@ export default async function TodayPage() {
 
   const { due, upcoming } = computeReminders((data ?? []) as ReminderLead[]);
 
+  // Które follow-upy mają już zapisany szkic (żeby nie pisać ich drugi raz)
+  const aiEnabled = claudeConfigured();
+  let drafted = new Set<string>();
+  if (aiEnabled && due.length) {
+    const { data: msgs } = await supabase
+      .from("lead_messages")
+      .select("lead_id,kind,body")
+      .in(
+        "lead_id",
+        due.map((r) => r.lead.id),
+      );
+    drafted = new Set(
+      (msgs ?? []).filter((m) => m.body?.trim()).map((m) => `${m.lead_id}:${m.kind}`),
+    );
+  }
+
   return (
     <div className="mx-auto max-w-3xl space-y-4">
       <div>
@@ -34,6 +52,17 @@ export default async function TodayPage() {
         <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-800">
           Błąd wczytywania: {error.message}
         </p>
+      )}
+
+      {aiEnabled && due.length > 0 && (
+        <TodayBatch
+          items={due.map((r) => ({
+            leadId: r.lead.id,
+            name: r.lead.name,
+            kind: r.kind,
+            hasDraft: drafted.has(`${r.lead.id}:${r.kind}`),
+          }))}
+        />
       )}
 
       {due.length === 0 ? (

@@ -72,6 +72,21 @@ Google wymaga podpięcia karty, ale z limitem dziennym poniżej rachunek wynosi 
 Użycie: **Leady → Szukaj w Google** → region (np. „Scottsdale, AZ”) i hasło → **Szukaj** → zaznacz
 firmy → **Dodaj zaznaczone**. Aplikacja od razu sprawdza ich strony (e-mail, wideo).
 
+## Claude pisze maile sam (Etap 6, opcjonalny)
+Przycisk **✨ Napisz maila (Claude)** przy leadzie i **Przygotuj wszystkie follow-upy** w zakładce **Dziś**.
+Claude (model `claude-sonnet-5-5`) tylko pisze szkice — wysyłasz sam. Koszt: ok. 1–2 centy za maila,
+płatne z doładowania konta API (abonament Claude Pro nie obejmuje API).
+
+1. [console.anthropic.com](https://console.anthropic.com) → zaloguj się → **Billing** → doładuj np. 5 USD.
+2. (Dla spokoju) **Limits / Spend limits** → ustaw miesięczny limit wydatków, np. 5 USD.
+3. **API Keys → Create Key** → nazwa `villa-leads` → skopiuj klucz (pokazuje się tylko raz).
+4. Vercel → **Settings → Environment Variables** → `ANTHROPIC_API_KEY` = klucz, typ **Secret**
+   → **Save** → **Deployments → … → Redeploy**.
+5. Supabase → wklej ponownie cały `supabase/schema.sql` → **Run** (nowa kolumna na fragment strony firmy).
+
+Przy sprawdzaniu strony firmy aplikacja zapisuje krótki fragment tekstu ze strony głównej — Claude
+używa go, żeby mail był bardziej osobisty. Dla starszych leadów kliknij **Sprawdź stronę** jeszcze raz.
+
 ### Lokalnie (opcjonalnie, dla programisty)
 ```bash
 cp .env.example .env.local   # uzupełnij wartości

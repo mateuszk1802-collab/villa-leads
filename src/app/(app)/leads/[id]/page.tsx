@@ -10,6 +10,7 @@ import { DoNotContactToggle } from "@/components/DoNotContactToggle";
 import { EnrichButton } from "@/components/EnrichButton";
 import { LEAD_TYPE_LABEL, formatDate, type Lead } from "@/lib/leads";
 import type { LeadMessage } from "@/lib/messages";
+import { claudeConfigured } from "@/lib/claude";
 import { loadSettings } from "@/lib/settings";
 import { requireUser } from "@/lib/supabase/server";
 
@@ -106,7 +107,12 @@ export default async function LeadPage({ params }: PageProps<"/leads/[id]">) {
         </dl>
       </section>
 
-      <MessagesPanel lead={lead} settings={settings} messages={messages} />
+      <MessagesPanel
+        lead={lead}
+        settings={settings}
+        messages={messages}
+        aiEnabled={claudeConfigured()}
+      />
 
       <DoNotContactToggle
         id={lead.id}
