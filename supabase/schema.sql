@@ -1,4 +1,4 @@
--- Villa Leads — schemat bazy (Etapy 1–6)
+-- Villa Leads — schemat bazy (Etapy 1–7)
 -- Wklej całość w Supabase → SQL Editor → New query → Run.
 -- Skrypt można bezpiecznie uruchomić ponownie.
 
@@ -174,6 +174,12 @@ create unique index if not exists leads_user_place_key
 -- =====================================================================
 
 alter table public.leads add column if not exists site_excerpt text;
+
+-- =====================================================================
+-- Etap 7: cena dla pierwszych klientów (darmowe demo → płatny film)
+-- =====================================================================
+
+alter table public.settings add column if not exists pilot_offer text;
 
 -- Uprawnienia dla zalogowanego użytkownika (dostęp i tak ograniczają reguły RLS powyżej)
 grant select, insert, update, delete on public.leads, public.settings, public.lead_messages

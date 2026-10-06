@@ -198,6 +198,7 @@ const SETTINGS_FIELDS = [
   "unsubscribe_text",
   "footer",
   "offer_text",
+  "pilot_offer",
   "extra_instructions",
 ] as const;
 
