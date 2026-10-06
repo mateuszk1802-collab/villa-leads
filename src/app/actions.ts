@@ -295,3 +295,23 @@ export async function setDoNotContact(id: string, value: boolean): Promise<{ err
   revalidatePath("/", "layout");
   return {};
 }
+
+/** Etapy, na których lead nie dostał jeszcze żadnego maila — tylko takie usuwamy hurtowo. */
+const UNCONTACTED_STAGES: Stage[] = ["new", "verified", "demo_done"];
+
+/**
+ * Usuwa leady bez adresu e-mail, z którymi nie było jeszcze kontaktu.
+ * Pomija listę „Nie kontaktować” — te zostają, żeby nie dodać ich ponownie.
+ */
+export async function deleteLeadsWithoutEmail(): Promise<{ deleted?: number; error?: string }> {
+  const { supabase } = await requireUser();
+  const { error, count } = await supabase
+    .from("leads")
+    .delete({ count: "exact" })
+    .is("email", null)
+    .eq("do_not_contact", false)
+    .in("stage", UNCONTACTED_STAGES);
+  if (error) return { error: `Błąd usuwania: ${error.message}` };
+  revalidatePath("/", "layout");
+  return { deleted: count ?? 0 };
+}

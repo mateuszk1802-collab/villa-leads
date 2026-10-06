@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DeleteNoEmailButton } from "@/components/DeleteNoEmailButton";
 import { StageBadge } from "@/components/StageBadge";
 import {
   HAS_VIDEO,
@@ -27,6 +28,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Search
   const type = one(sp.type);
   const video = one(sp.video);
   const dnc = one(sp.dnc) === "1" ? "1" : undefined;
+  const noemail = one(sp.noemail) === "1" ? "1" : undefined;
 
   const { supabase } = await requireUser();
 
@@ -40,6 +42,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Search
   if (isLeadType(type)) query = query.eq("lead_type", type);
   if (isHasVideo(video)) query = query.eq("has_video", video);
   if (dnc) query = query.eq("do_not_contact", true);
+  if (noemail) query = query.is("email", null);
   if (q) {
     // Znaki , ( ) * % mają specjalne znaczenie w filtrze PostgREST — usuwamy je
     const safe = q.replace(/[,()*%\\]/g, " ").trim();
@@ -53,7 +56,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Search
 
   const [{ data: leads, error }, { data: allStages }] = await Promise.all([
     query,
-    supabase.from("leads").select("stage,do_not_contact"),
+    supabase.from("leads").select("stage,do_not_contact,email"),
   ]);
 
   const counts = new Map<Stage, number>();
@@ -62,10 +65,16 @@ export default async function LeadsPage({ searchParams }: { searchParams: Search
   }
   const total = allStages?.length ?? 0;
   const dncCount = (allStages ?? []).filter((r) => r.do_not_contact).length;
+  const noEmailCount = (allStages ?? []).filter((r) => !r.email).length;
+  // Te same warunki co w deleteLeadsWithoutEmail: bez e-maila, bez kontaktu, nie na liście „Nie kontaktować”
+  const deletableCount = (allStages ?? []).filter(
+    (r) =>
+      !r.email && !r.do_not_contact && ["new", "verified", "demo_done"].includes(r.stage as string),
+  ).length;
 
   function hrefWith(params: Record<string, string | undefined>) {
     const next = new URLSearchParams();
-    const merged = { q: q || undefined, stage, type, video, dnc, ...params };
+    const merged = { q: q || undefined, stage, type, video, dnc, noemail, ...params };
     for (const [k, v] of Object.entries(merged)) if (v) next.set(k, v);
     const s = next.toString();
     return s ? `/leads?${s}` : "/leads";
@@ -107,7 +116,10 @@ export default async function LeadsPage({ searchParams }: { searchParams: Search
 
       {/* Etapy jako szybkie filtry */}
       <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
-        <Chip href={hrefWith({ stage: undefined, dnc: undefined })} active={!isStage(stage) && !dnc}>
+        <Chip
+          href={hrefWith({ stage: undefined, dnc: undefined, noemail: undefined })}
+          active={!isStage(stage) && !dnc && !noemail}
+        >
           Wszystkie <span className="opacity-60">{total}</span>
         </Chip>
         {STAGES.map((s) => (
@@ -118,11 +130,15 @@ export default async function LeadsPage({ searchParams }: { searchParams: Search
         <Chip href={hrefWith({ stage: undefined, dnc: dnc ? undefined : "1" })} active={Boolean(dnc)}>
           Nie kontaktować <span className="opacity-60">{dncCount}</span>
         </Chip>
+        <Chip href={hrefWith({ noemail: noemail ? undefined : "1" })} active={Boolean(noemail)}>
+          Bez e-maila <span className="opacity-60">{noEmailCount}</span>
+        </Chip>
       </div>
 
       <form method="get" className="card grid gap-2 p-3 sm:grid-cols-[1fr_auto_auto_auto]">
         {isStage(stage) && <input type="hidden" name="stage" value={stage} />}
         {dnc && <input type="hidden" name="dnc" value="1" />}
+        {noemail && <input type="hidden" name="noemail" value="1" />}
         <input
           name="q"
           defaultValue={q}
@@ -155,6 +171,8 @@ export default async function LeadsPage({ searchParams }: { searchParams: Search
           </Link>
         </div>
       </form>
+
+      {noemail && <DeleteNoEmailButton count={deletableCount} />}
 
       {error && (
         <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-800">
