@@ -34,6 +34,7 @@ export type Settings = {
   unsubscribe_text: string | null;
   footer: string | null;
   offer_text: string | null;
+  pilot_offer: string | null;
   extra_instructions: string | null;
 };
 
@@ -48,6 +49,7 @@ export const EMPTY_SETTINGS: Settings = {
   unsubscribe_text: null,
   footer: null,
   offer_text: null,
+  pilot_offer: null,
   extra_instructions: null,
 };
 
@@ -97,25 +99,32 @@ const KIND_EN: Record<MessageKind, string> = {
   followup_2: "Follow-up 2 (final)",
 };
 
+export const DEFAULT_PILOT_OFFER = "$250 per video for my first clients (regular price $500)";
+
 const KIND_INSTRUCTIONS: Record<MessageKind, string> = {
   initial: [
     "This is the FIRST email — they have never heard from me.",
     "- Open with something specific I noticed about their property or business (use my notes).",
     "- In one or two sentences explain what I do and why it helps them (more bookings, listings that stand out, content for social media and their website).",
-    "- If a demo video link is provided, say I already made a short sample from their photos and include the link.",
-    "- End with one low-friction question (e.g. whether they'd like to see a sample / whether this is worth a quick look).",
+    "- The goal of this email is to get them to accept a FREE sample, not to sell the paid video.",
+    "- If a demo video link is provided: say I already made a short free sample from their listing photos, include the link, and make clear there is no cost or obligation.",
+    "- If no demo link is provided: offer to make a free 15–20 second sample from their existing listing photos — no cost, no obligation, nothing needed from them.",
+    "- Do NOT mention any price in this email.",
+    "- End with one low-friction yes/no question (e.g. \"Want me to put one together for you?\" or \"Did you get a chance to watch it?\").",
   ].join("\n"),
   followup_1: [
     "This is FOLLOW-UP 1, sent about 4 days after my first email, which got no reply.",
     "- Keep it shorter than the first email (about 50–90 words in the body).",
     "- Do not repeat the first email; add one new angle or benefit.",
+    "- Restate the free sample offer in one sentence (or ask if they watched the sample, if a demo link exists).",
+    "- You may mention the founding-client price once, briefly, as what the full video costs if they like the sample.",
     "- Reply in the same thread, so the subject should be \"Re: <first email subject>\" if the first subject is known.",
     "- End with a simple yes/no question.",
   ].join("\n"),
   followup_2: [
     "This is FOLLOW-UP 2, the last email, sent about 7 days after follow-up 1, still no reply.",
     "- Very short (about 40–70 words in the body), friendly, zero pressure.",
-    "- Politely close the loop: say this is my last note and the door stays open.",
+    "- Politely close the loop: say this is my last note and the free sample offer stays open.",
     "- Subject should be \"Re: <first email subject>\" if known.",
   ].join("\n"),
 };
@@ -138,7 +147,8 @@ export function buildPrompt(args: {
 
   const about = [
     "- I create short, cinematic promo videos for luxury vacation rentals (villas, large homes with spacious interiors) using ONLY their existing photos — no on-site filming, no disruption for guests.",
-    "- Price: about $500 per video.",
+    "- How it works: the first step is always a FREE short sample video made from their existing photos. They pay only if they like it and want the full video.",
+    `- Founding-client price (only for follow-ups or if they ask): ${settings.pilot_offer?.trim() || DEFAULT_PILOT_OFFER}.`,
     settings.offer_text?.trim() ? `- More about my offer: ${settings.offer_text.trim()}` : null,
     line("My portfolio / sample work", settings.portfolio_url),
     line("My name", settings.sender_name),
@@ -198,6 +208,7 @@ export function buildPrompt(args: {
     "- Maximum 120 words in the body (not counting the footer).",
     "- Personal, warm, natural tone — like one person writing to another. No hype, no buzzwords, no exclamation marks overload, no flattery clichés.",
     "- Mention at least one specific detail about them from the information above. Do not invent facts that are not given.",
+    "- Never claim past clients, results, testimonials, years of experience, or a number of videos made. Do not mention a portfolio unless a portfolio link is given above.",
     "- One clear call to action.",
     "- Plain text only, no markdown, no placeholders like [Name].",
     "- Include a subject line: short (max 7 words), specific, not salesy.",

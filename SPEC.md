@@ -57,6 +57,10 @@ Zasady:
   „Kopiuj” i „Otwórz w poczcie”.
 - Moje dane i stopka edytowalne w Ustawieniach.
 
+Strategia: pierwszy kontakt proponuje darmowe demo (15–20 s z ich zdjęć) bez ceny; follow-up może raz
+wspomnieć cenę dla pierwszych klientów (domyślnie $250, zwykła $500, edytowalne w Ustawieniach).
+Maile nigdy nie zawierają wymyślonych klientów, wyników ani doświadczenia.
+
 ### 6. Wysyłka ręczna
 Przyciski „Kopiuj” i „Otwórz w poczcie” (`mailto:`). Po kliknięciu „Wysłałem” aplikacja zapisuje
 datę i przesuwa etap. Aplikacja NIGDY nie wysyła maili sama.

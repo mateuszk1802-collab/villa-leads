@@ -2,7 +2,13 @@
 
 import { startTransition, useActionState, useState } from "react";
 import { saveSettings } from "@/app/actions";
-import { DEFAULT_UNSUBSCRIBE, buildFooter, footerProblems, type Settings } from "@/lib/messages";
+import {
+  DEFAULT_PILOT_OFFER,
+  DEFAULT_UNSUBSCRIBE,
+  buildFooter,
+  footerProblems,
+  type Settings,
+} from "@/lib/messages";
 
 type Field = {
   name: keyof Settings;
@@ -45,6 +51,12 @@ const FOOTER: Field[] = [
 ];
 
 const CLAUDE: Field[] = [
+  {
+    name: "pilot_offer",
+    label: "Cena dla pierwszych klientów (po angielsku)",
+    placeholder: DEFAULT_PILOT_OFFER,
+    hint: "Puste = „$250 dla pierwszych klientów (zwykła cena $500)”. Pierwszy mail zawsze proponuje darmowe demo bez ceny; cena pojawia się dopiero w follow-upie.",
+  },
   {
     name: "offer_text",
     label: "Dodatkowy opis oferty (po angielsku, opcjonalnie)",

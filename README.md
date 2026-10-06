@@ -33,6 +33,12 @@ Każdy pull request dostaje też własny podgląd (link „Preview” w komentar
 Gdy nowa wersja zmienia bazę, wklej ponownie **cały** plik `supabase/schema.sql`
 w SQL Editor → **Run** (skrypt można uruchamiać wielokrotnie, nie kasuje danych).
 
+## Strategia maili: darmowe demo → płatny film
+Pierwszy mail zawsze proponuje **darmowe krótkie demo** z ich zdjęć (albo daje link, jeśli w leadzie jest
+„Link do demo”) i nie podaje ceny. Follow-up może raz wspomnieć cenę dla pierwszych klientów
+(**Ustawienia → Cena dla pierwszych klientów**, domyślnie $250 zamiast $500). Claude nigdy nie wymyśla
+klientów, wyników ani doświadczenia.
+
 ## Jak przygotować maila (Etap 2)
 1. **Ustawienia** → uzupełnij swoje dane i adres pocztowy (stopka CAN-SPAM).
 2. Na stronie leada wybierz typ maila → **Kopiuj prompt dla Claude** → **Otwórz Claude** → wklej.
